@@ -1,9 +1,9 @@
 package com.muc;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.*;
 import java.net.Socket;
-import java.nio.Buffer;
-import java.util.Date;
 
 public class ServerWorker extends Thread {
     private Socket clientSocket;
@@ -28,13 +28,38 @@ public class ServerWorker extends Thread {
         OutputStream outputStream = clientSocket.getOutputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
+
         while ((line = reader.readLine()) != null) {
-            if ("quit".equalsIgnoreCase(line)) {
-                break;
+            String[] tokens = StringUtils.split(line);
+            if (tokens != null && tokens.length > 0) {
+                String cmd = tokens[0];
+                if ("quit".equalsIgnoreCase(cmd)) {
+                    break;
+                } else if ("login".equalsIgnoreCase(cmd)) {
+                    handleLogin(outputStream, tokens);
+
+                } else {
+                    String msg = "Unknown command: " + cmd + "\n";
+                    outputStream.write(msg.getBytes());
+                }
             }
-            String msg = "You typed: " + line + "\n";
-            outputStream.write(msg.getBytes());
         }
+
         clientSocket.close();
+    }
+
+    private void handleLogin(OutputStream outputStream, String[] tokens) throws IOException {
+        if (tokens.length == 3) {
+            String login = tokens[1];
+            String password = tokens[2];
+            if (login.equals("guest") && password.equals("guest")) {
+                String msg = "Ok login\n";
+                outputStream.write(msg.getBytes());
+            } else {
+                String msg = "Error login\n";
+                outputStream.write(msg.getBytes());
+            }
+        }
+
     }
 }
