@@ -1,7 +1,5 @@
 package com.muc;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.*;
 import java.net.Socket;
 
@@ -30,7 +28,7 @@ public class ServerWorker extends Thread {
         String line;
 
         while ((line = reader.readLine()) != null) {
-            String[] tokens = StringUtils.split(line);
+            String[] tokens = line.split(" ");
             if (tokens != null && tokens.length > 0) {
                 String cmd = tokens[0];
                 if ("quit".equalsIgnoreCase(cmd)) {
