@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.List;
 
+//TODO add class comment
 public class ServerWorker extends Thread {
     private final Socket clientSocket;
     private final Server server;
@@ -42,6 +43,8 @@ public class ServerWorker extends Thread {
                 } else if ("login".equalsIgnoreCase(cmd)) {
                     handleLogin(outputStream, tokens);
 
+                } else if ("logout".equalsIgnoreCase(cmd)) {
+                    handleLogout(outputStream);
                 } else {
                     String msg = "Unknown command: " + cmd + "\n";
                     outputStream.write(msg.getBytes());
@@ -75,6 +78,20 @@ public class ServerWorker extends Thread {
             } else {
                 String msg = "Error login\n";
                 outputStream.write(msg.getBytes());
+            }
+        }
+
+    }
+
+    private void handleLogout(OutputStream outputStream) throws IOException {
+        if (this.login == null) {
+            String noUserMsg = "Not logged in\n";
+            outputStream.write(noUserMsg.getBytes());
+        } else {
+            String logoutMsg = this.login + " has logged out";
+            List<ServerWorker> workerList = server.getWorkerList();
+            for (ServerWorker worker : workerList) {
+                worker.send(logoutMsg);
             }
         }
 

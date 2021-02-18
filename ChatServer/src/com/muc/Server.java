@@ -25,6 +25,7 @@ public class Server extends Thread {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 // Create new thread for each connection
+                System.out.println("new client connected");
                 ServerWorker worker = new ServerWorker(this, clientSocket);
                 workerList.add(worker);
                 worker.start();
