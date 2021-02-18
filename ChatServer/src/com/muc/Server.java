@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Server extends Thread {
     private int serverPort;
@@ -13,6 +14,10 @@ public class Server extends Thread {
         this.serverPort = serverPort;
     }
 
+    public List<ServerWorker> getWorkerList() {
+        return workerList;
+    }
+
     @Override
     public void run() {
         try {
@@ -20,7 +25,7 @@ public class Server extends Thread {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 // Create new thread for each connection
-                ServerWorker worker = new ServerWorker(clientSocket);
+                ServerWorker worker = new ServerWorker(this, clientSocket);
                 workerList.add(worker);
                 worker.start();
             }
