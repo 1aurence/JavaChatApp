@@ -43,8 +43,6 @@ public class ServerWorker extends Thread {
                 } else if ("login".equalsIgnoreCase(cmd)) {
                     handleLogin(outputStream, tokens);
 
-                } else if ("logout".equalsIgnoreCase(cmd)) {
-                    handleLogout(outputStream);
                 } else {
                     String msg = "Unknown command: " + cmd + "\n";
                     outputStream.write(msg.getBytes());
@@ -60,53 +58,27 @@ public class ServerWorker extends Thread {
     }
 
     private void handleLogin(OutputStream outputStream, String[] tokens) throws IOException {
-
         if (tokens.length == 3) {
             String login = tokens[1];
             String password = tokens[2];
-            if (this.login != null) {
-                String msg = "Already logged in\n";
+            if (login.equals("guest") && password.equals("guest") || login.equals("joe") && password.equals("joe")) {
+                String msg = "Ok login\n";
                 outputStream.write(msg.getBytes());
-            } else {
-                if (login.equals("guest") && password.equals("guest") || login.equals("joe") && password.equals("joe")) {
-                    String msg = "Ok login\n";
-                    outputStream.write(msg.getBytes());
-                    this.login = login;
-                    System.out.println("User logged in successfully: " + login);
-
-                    String onlineMsg = login + " has logged in" + "\n";
-                    List<ServerWorker> workerList = server.getWorkerList();
-                    for (ServerWorker worker : workerList) {
-                        worker.send(onlineMsg);
-                    }
-
-                } else {
-                    String msg = "Error login\n";
-                    outputStream.write(msg.getBytes());
+                this.login = login;
+                System.out.println("User logged in successfully: " + login);
+                String onlineMsg = login + " has logged in\n";
+                List<ServerWorker> workerList = server.getWorkerList();
+                for (ServerWorker worker : workerList) {
+                    worker.send(onlineMsg);
                 }
             }
-
-
-        }
-
-    }
-
-    private void handleLogout(OutputStream outputStream) throws IOException {
-        if (this.login == null) {
-            String msg = "Not logged in\n";
-            outputStream.write(msg.getBytes());
         } else {
-            String logoutMsg = this.login + " has logged out\n";
-            List<ServerWorker> workerList = server.getWorkerList();
-            for (ServerWorker worker : workerList) {
-                worker.send(logoutMsg);
-            }
-            this.login = null;
+            String msg = "Error login\n";
+            outputStream.write(msg.getBytes());
         }
-
     }
 
-    private void send(String onlineMsg) throws IOException {
-        this.outputStream.write(onlineMsg.getBytes());
+    private void send(String msg) throws IOException {
+        this.outputStream.write(msg.getBytes());
     }
 }
